@@ -21,4 +21,5 @@ class HostForm(FlaskForm):
     host_name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     ph_number = IntegerField('Phone Number', validators=[DataRequired()]) 
+    Address = StringField('Address', default='Summer Geeks')
     submit = SubmitField('Register')
