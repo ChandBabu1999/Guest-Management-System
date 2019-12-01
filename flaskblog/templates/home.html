@@ -35,13 +35,25 @@
         </div>
       </nav>
     </header>
-    <div class="container">
+    
+    <main role="main" class="container">
       <div class="row">
-        <div class="col-md-8 mx-auto">
+        <div class="col-md-8">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
           {% block content %} {% endblock %}
         </div>
       </div>
-    </div>
+    </main>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -2,6 +2,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flaskblog import app, db
 from flaskblog.forms import Visitor_CheckIn_Form, Visitor_CheckOut_Form, HostForm
 from flaskblog.models import Visitor, Host
+from datetime import datetime
 
 
 @app.route("/")
@@ -10,7 +11,7 @@ def home():
     print('\n\n\n\n\n\nHost=', Host.query.all(),'\nVisitors :')
     vis = Visitor.query.all()
     for x in vis:
-        print(x.name, x.email, x.ph_number, x.check_in_time, x.check_out_time)
+        print(x.name, x.email, x.ph_number, x.check_in_time, type(x.check_out_time))
     print()
     return render_template('home.html', title='home')
 
@@ -40,11 +41,9 @@ def check_in():
     form = Visitor_CheckIn_Form()
     if form.validate_on_submit():
         # check if he/she has already checked in?        
-        visitor = Visitor(name=form.visitor_name.data, 
-                email=form.email.data, ph_number=form.ph_number.data)
-        visitor_exist = db.session.query(db.exists().where(
-            Visitor.email == visitor.email and Visitor.check_out_time is None)).scalar()
-        print('\n\n\n\n\njasdfjavdsfbajsdfa:',visitor,'\n',visitor_exist)
+        visitor = Visitor(name=form.visitor_name.data,
+            email=form.email.data, ph_number=form.ph_number.data)
+        visitor_exist = Visitor.query.filter_by(email=form.email.data, check_out_time = None).first()
         if visitor_exist:
             flash(f"You are already Checked-In","danger")
             return redirect(url_for('home'))
@@ -60,13 +59,12 @@ def check_out():
     form = Visitor_CheckOut_Form()
     if form.validate_on_submit():
         # check if he/she has checked in or not?       
-        return redirect(url_for('home')) 
-        # visitor_exist = db.session.query(db.exists().where(
-        #     Visitor.email == visitor.email and Visitor.check_out_time is None)).scalar()
-        # print('\n\n\n\n\njasdfjavdsfbajsdfa:',visitor_exist)
-        # if visitor_exist:
-        #     flash(f"You are already Checked-In","danger")
-        #     return redirect(url_for('home'))
-        # flash(f'You have not checked-in yet (check mail, number)','success')
-        # return redirect(url_for('home'))
-    return render_template('flask_form.html', message='Check-In Here', title='check-in', form=form)
+        visitor_exist = Visitor.query.filter_by(email=form.email.data, check_out_time = None).first()
+        if visitor_exist:
+            flash(f"You are Checked-Out Succeessfully","success")
+            admin = Visitor.query.filter_by(email=form.email.data, ph_number=form.ph_number.data).update(dict(
+                check_out_time=datetime.now()))
+            db.session.commit()
+            return redirect(url_for('home'))
+        flash(f'You have not checked-in yet (check mail, number)','danger')
+    return render_template('flask_form.html', message='Check-Out Here', title='check-in', form=form)
