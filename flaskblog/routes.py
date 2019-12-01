@@ -55,6 +55,18 @@ def check_in():
     return render_template('flask_form.html', message='Check-In Here', title='check-in', form=form)
 
 
-@app.route("/check_out")
+@app.route("/check_out", methods=['GET', 'POST'])
 def check_out():
-    return render_template('flask_form.html', message='Chek-Out Here', title='check-out', form=form)
+    form = Visitor_CheckOut_Form()
+    if form.validate_on_submit():
+        # check if he/she has checked in or not?       
+        return redirect(url_for('home')) 
+        # visitor_exist = db.session.query(db.exists().where(
+        #     Visitor.email == visitor.email and Visitor.check_out_time is None)).scalar()
+        # print('\n\n\n\n\njasdfjavdsfbajsdfa:',visitor_exist)
+        # if visitor_exist:
+        #     flash(f"You are already Checked-In","danger")
+        #     return redirect(url_for('home'))
+        # flash(f'You have not checked-in yet (check mail, number)','success')
+        # return redirect(url_for('home'))
+    return render_template('flask_form.html', message='Check-In Here', title='check-in', form=form)
